@@ -38,6 +38,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('user_management.urls')),
     path('api/', include('health_info.urls')),
+    path('api/medication/', include('medication_reminder.urls')),
     
     # API文档URL
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

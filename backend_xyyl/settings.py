@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # 自定义应用
     'health_info',
     'user_management',
+    'medication_reminder',  # 新增药物提醒应用
     'rest_framework_simplejwt.token_blacklist',
 ]
 

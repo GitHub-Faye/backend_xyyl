@@ -111,21 +111,133 @@ class HealthRecordViewSet(viewsets.ModelViewSet):
     
     def _get_blood_pressure_statistics(self, queryset):
         """获取血压统计数据"""
-        # 实现血压统计逻辑
-        # ...类似于体重统计的实现
-        pass
+        # 使用单个聚合查询获取统计数据
+        stats = queryset.aggregate(
+            avg_systolic=Avg('systolic_pressure'),
+            max_systolic=Max('systolic_pressure'),
+            min_systolic=Min('systolic_pressure'),
+            avg_diastolic=Avg('diastolic_pressure'),
+            max_diastolic=Max('diastolic_pressure'),
+            min_diastolic=Min('diastolic_pressure'),
+            count=Count('id')
+        )
+        
+        # 获取趋势数据
+        trend_data = list(queryset
+            .annotate(date=TruncDate('record_time'))
+            .values('date')
+            .annotate(
+                avg_systolic=Avg('systolic_pressure'),
+                avg_diastolic=Avg('diastolic_pressure')
+            )
+            .order_by('date')
+        )
+        
+        # 格式化数据
+        data = []
+        for item in trend_data:
+            if item['date'] and item['avg_systolic'] and item['avg_diastolic']:
+                data.append({
+                    'date': item['date'].strftime('%Y-%m-%d'),
+                    'systolic': round(float(item['avg_systolic']), 0),
+                    'diastolic': round(float(item['avg_diastolic']), 0)
+                })
+        
+        # 计算平均值
+        avg_systolic = round(float(stats['avg_systolic'] or 0), 0)
+        avg_diastolic = round(float(stats['avg_diastolic'] or 0), 0)
+        
+        return {
+            'average': f"{avg_systolic}/{avg_diastolic}",
+            'max': f"{round(float(stats['max_systolic'] or 0), 0)}/{round(float(stats['max_diastolic'] or 0), 0)}",
+            'min': f"{round(float(stats['min_systolic'] or 0), 0)}/{round(float(stats['min_diastolic'] or 0), 0)}",
+            'count': stats['count'] or 0,
+            'data': data
+        }
     
     def _get_heart_rate_statistics(self, queryset):
         """获取心率统计数据"""
-        # 实现心率统计逻辑
-        # ...类似于体重统计的实现
-        pass
+        # 使用聚合查询获取统计数据
+        stats = queryset.aggregate(
+            avg_value=Avg('heart_rate'),
+            max_value=Max('heart_rate'),
+            min_value=Min('heart_rate'),
+            count=Count('id')
+        )
+        
+        # 获取趋势数据
+        trend_data = list(queryset
+            .annotate(date=TruncDate('record_time'))
+            .values('date')
+            .annotate(
+                avg_value=Avg('heart_rate')
+            )
+            .order_by('date')
+        )
+        
+        # 格式化数据
+        data = []
+        for item in trend_data:
+            if item['date'] and item['avg_value']:
+                data.append({
+                    'date': item['date'].strftime('%Y-%m-%d'),
+                    'value': round(float(item['avg_value']), 0)  # 心率取整数
+                })
+        
+        # 计算平均值
+        avg_value = round(float(stats['avg_value'] or 0), 0)
+        max_value = round(float(stats['max_value'] or 0), 0)
+        min_value = round(float(stats['min_value'] or 0), 0)
+        
+        return {
+            'average': str(avg_value),
+            'max': str(max_value),
+            'min': str(min_value),
+            'count': stats['count'] or 0,
+            'data': data
+        }
     
     def _get_blood_sugar_statistics(self, queryset):
         """获取血糖统计数据"""
-        # 实现血糖统计逻辑
-        # ...类似于体重统计的实现
-        pass
+        # 使用聚合查询获取统计数据
+        stats = queryset.aggregate(
+            avg_value=Avg('blood_sugar'),
+            max_value=Max('blood_sugar'),
+            min_value=Min('blood_sugar'),
+            count=Count('id')
+        )
+        
+        # 获取趋势数据
+        trend_data = list(queryset
+            .annotate(date=TruncDate('record_time'))
+            .values('date')
+            .annotate(
+                avg_value=Avg('blood_sugar')
+            )
+            .order_by('date')
+        )
+        
+        # 格式化数据
+        data = []
+        for item in trend_data:
+            if item['date'] and item['avg_value']:
+                data.append({
+                    'date': item['date'].strftime('%Y-%m-%d'),
+                    'value': round(float(item['avg_value']), 1)  # 血糖保留一位小数
+                })
+        
+        # 计算平均值
+        avg_value = round(float(stats['avg_value'] or 0), 1)
+        max_value = round(float(stats['max_value'] or 0), 1)
+        min_value = round(float(stats['min_value'] or 0), 1)
+        
+        return {
+            'average': str(avg_value),
+            'max': str(max_value),
+            'min': str(min_value),
+            'count': stats['count'] or 0,
+            'data': data
+        }
 
     @action(detail=False, methods=['get'])
     def statistics(self, request):
