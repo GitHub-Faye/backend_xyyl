@@ -1,11 +1,5 @@
 import os
 import sys
-from pathlib import Path
-from dotenv import load_dotenv
-
-# 加载环境变量
-env_path = Path('/home/wyw123/小艺医疗web/backend_xyyl/.env')
-load_dotenv(env_path)
 
 # 添加项目路径
 path = '/home/wyw123/小艺医疗web/backend_xyyl'

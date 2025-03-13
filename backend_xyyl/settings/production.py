@@ -12,16 +12,16 @@ ALLOWED_HOSTS = ['wyw123.pythonanywhere.com']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/home/wyw123/小艺医疗web/backend_xyyl/db.sqlite3',
+        'NAME': '/home/wyw123/backend_xyyl/db.sqlite3',
     }
 }
 
 # 静态文件配置
-STATIC_ROOT = '/home/wyw123/小艺医疗web/backend_xyyl/static'
+STATIC_ROOT = '/home/wyw123/backend_xyyl/static'
 STATIC_URL = '/static/'
 
 # 媒体文件配置
-MEDIA_ROOT = '/home/wyw123/小艺医疗web/backend_xyyl/media'
+MEDIA_ROOT = '/home/wyw123/backend_xyyl/media'
 MEDIA_URL = '/media/'
 
 # CORS配置
@@ -60,12 +60,21 @@ LOGGING = {
             'format': '[{levelname}] {asctime} {module} {process:d} {thread:d} {message}',
             'style': '{',
         },
+        'simple': {
+            'format': '[{levelname}] {asctime} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/home/wyw123/小艺医疗web/backend_xyyl/logs/django.log',
+            'filename': '/home/wyw123/backend_xyyl/logs/django.log',
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'verbose',
@@ -74,12 +83,12 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': True,
         },
         'medication_reminder': {
-            'handlers': ['file'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
         },
