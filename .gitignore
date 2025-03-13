@@ -75,4 +75,24 @@ ENV/
 /logs/
 
 # 临时文件
-/tmp/ 
+/tmp/
+
+# 新增的代码块
+*.pot
+*.pyc
+static/
+logs/
+
+# 新增的虚拟环境
+venv/
+ENV/
+
+# 新增的IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 新增的OS
+.DS_Store
+Thumbs.db 

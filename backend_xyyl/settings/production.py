@@ -12,12 +12,17 @@ ALLOWED_HOSTS = ['wyw123.pythonanywhere.com']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': '/home/wyw123/小艺医疗web/backend_xyyl/db.sqlite3',
     }
 }
 
 # 静态文件配置
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = '/home/wyw123/小艺医疗web/backend_xyyl/static'
+STATIC_URL = '/static/'
+
+# 媒体文件配置
+MEDIA_ROOT = '/home/wyw123/小艺医疗web/backend_xyyl/media'
+MEDIA_URL = '/media/'
 
 # CORS配置
 CORS_ALLOW_ALL_ORIGINS = False
@@ -39,7 +44,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
 # 安全设置
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False  # PythonAnywhere 已经处理了 SSL
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
@@ -60,7 +65,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/home/wyw123/小艺医疗web/logs/django.log',
+            'filename': '/home/wyw123/小艺医疗web/backend_xyyl/logs/django.log',
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'verbose',
