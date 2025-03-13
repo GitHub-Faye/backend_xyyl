@@ -7,7 +7,7 @@ class MedicationReminderAdmin(admin.ModelAdmin):
     list_filter = ('frequency', 'is_active')
     search_fields = ('name', 'user__username', 'description')
     date_hierarchy = 'created_at'
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'start_date')
     fieldsets = (
         ('基本信息', {
             'fields': ('user', 'name', 'description', 'is_active')
@@ -16,10 +16,10 @@ class MedicationReminderAdmin(admin.ModelAdmin):
             'fields': ('frequency', 'weekdays', 'month_days', 'custom_interval')
         }),
         ('服药时间', {
-            'fields': ('times', 'start_date', 'end_date')
+            'fields': ('times', 'end_date')
         }),
         ('时间戳', {
-            'fields': ('created_at', 'updated_at'),
+            'fields': ('created_at', 'updated_at', 'start_date'),
             'classes': ('collapse',)
         }),
     )
