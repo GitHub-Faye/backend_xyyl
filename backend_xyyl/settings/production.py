@@ -1,7 +1,7 @@
 from .base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-production-secret-key')
+SECRET_KEY = 'django-insecure-2dzb=hq9wju8ok_1a90-js79_00mn$*pbcm*ev))u&b(8tazm='
 
 DEBUG = False
 
@@ -32,8 +32,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # 微信小程序配置
-WECHAT_APP_ID = os.environ.get('WECHAT_APP_ID', '')
-WECHAT_APP_SECRET = os.environ.get('WECHAT_APP_SECRET', '')
+WECHAT_APP_ID = os.environ.get('WECHAT_APP_ID', 'wx1a1bc043dae03c3e')
+WECHAT_APP_SECRET = os.environ.get('WECHAT_APP_SECRET', '28c9f799686403a0cb8c5412d14e76a7')
 
 # 邮件配置
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
