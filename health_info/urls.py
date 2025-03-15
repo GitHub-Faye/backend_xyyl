@@ -6,5 +6,6 @@ router = DefaultRouter()
 router.register(r'health-records', HealthRecordViewSet, basename='health-record')
 
 urlpatterns = [
+    # 只包含路由器生成的URLs，动作路由会自动注册为 /health-records/batch/
     path('', include(router.urls)),
 ] 

@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse
 from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.db.models import Avg, Max, Min, Count
 from django.db.models.functions import TruncDate
@@ -12,6 +12,24 @@ from datetime import datetime
 from .models import HealthRecord
 from .serializers import HealthRecordSerializer
 
+# 注释掉独立的批量创建视图函数
+# @api_view(['POST'])
+# @permission_classes([permissions.IsAuthenticated])
+# def batch_create_health_records(request):
+#     """
+#     批量创建健康记录
+#     
+#     接收格式: { records: [...健康记录列表...] }
+#     
+#     每条记录应包含:
+#     - weight: 体重(kg)
+#     - systolic_pressure: 收缩压(mmHg)
+#     - diastolic_pressure: 舒张压(mmHg)
+#     - heart_rate: 心率(次/分钟)
+#     - blood_sugar: 血糖(mmol/L)，可选
+#     - record_time: 记录时间
+#     """
+#     # ... 原有代码 ...
 
 class HealthRecordViewSet(viewsets.ModelViewSet):
     serializer_class = HealthRecordSerializer
@@ -38,6 +56,68 @@ class HealthRecordViewSet(viewsets.ModelViewSet):
             return HealthRecord.objects.none()
 
         return queryset
+    
+    # 添加批量创建健康记录的自定义动作
+    @action(detail=False, methods=['post'])
+    def batch(self, request):
+        """
+        批量创建健康记录
+        
+        接收格式: 健康记录对象的数组
+        
+        每条记录应包含:
+        - weight: 体重(kg)
+        - systolic_pressure: 收缩压(mmHg)
+        - diastolic_pressure: 舒张压(mmHg)
+        - heart_rate: 心率(次/分钟)
+        - blood_sugar: 血糖(mmol/L)，可选
+        - record_time: 记录时间
+        """
+        # 获取请求中的记录数据
+        request_data = request.data
+        
+        # 支持两种格式: 直接的记录数组 或 { records: [...] }
+        if isinstance(request_data, dict) and 'records' in request_data:
+            records_data = request_data['records']
+        else:
+            records_data = request_data
+        
+        # 确保数据是列表形式
+        if not isinstance(records_data, list):
+            return Response({
+                "success": False,
+                "message": "请求数据格式错误，应为健康记录列表或包含records字段的对象"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 如果列表为空，直接返回成功
+        if len(records_data) == 0:
+            return Response({
+                "success": True, 
+                "message": "没有需要同步的健康记录", 
+                "count": 0
+            }, status=status.HTTP_200_OK)
+        
+        # 为每条记录添加用户ID
+        user = request.user
+        for record in records_data:
+            record['user'] = user.id
+        
+        # 使用序列化器批量创建记录
+        serializer = self.get_serializer(data=records_data, many=True)
+        
+        if serializer.is_valid():
+            records = serializer.save()
+            # 返回更简洁的响应
+            return Response({
+                "success": True,
+                "message": f"成功创建 {len(records)} 条健康记录",
+                "count": len(records)
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response({
+            "success": False,
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
     
     def _get_date_range_for_period(self, period):
         """根据时间周期计算日期范围"""
